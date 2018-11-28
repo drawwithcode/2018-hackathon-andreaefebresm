@@ -8,13 +8,14 @@ var button;
 var volume = 0;
 var xoff = 0;
 var xnn = 0;
-
+var glx;
 var stars = [];
-
+var stelline = [];
 
 function preload() {
   maintheme = loadSound("./assets/Big Bang Theory - Sigla iniziale.mp3");
   img = loadImage("./assets/bbt.jpg");
+  glx = loadImage("./assets/Galaxy-Free-Download-PNG.png")
 }
 
 function setup() {
@@ -38,10 +39,21 @@ function setup() {
 
   }
 
+  var stellineNumber = 10;
+  for (var i = 0; i < stellineNumber; i++) {
+
+    var myStellina = new Stelline(random(0, width), random(0, height), volume*5);
+
+
+    stelline.push(myStellina);
+
+  }
+
 
   analyzer = new p5.Amplitude();
   analyzer.setInput(maintheme);
-
+  var volume = analyzer.getLevel();
+    volume = map(volume, 0, 1, 50, width);
 }
 
 function togglePlaying() {
@@ -99,6 +111,11 @@ function draw() {
     volume = map(volume, 0, 1, 50, width);
     var n = map(noise(xoff), 0, 1, 0, width);
     var m = map(noise(xnn), 0, 1, 0, volume);
+    for (var k = 0; k < stelline.length; k++) {
+
+      stelline[k].move();
+      stelline[k].display();
+    }
 
 
 
@@ -121,27 +138,84 @@ function draw() {
 
     push();
     translate(width / 2, height / 2);
-    rotate(volume*3);
+    rotate(volume*100);
     strokeWeight(4);
     stroke(lerpColor(color('#4D5359'), color('#FCB5B5'),frameCount/120));
-    line(200,0,cos(frameCount*2)*200,sin(frameCount*2)*200);
+    line(200,0,cos(frameCount)*200,sin(frameCount*2)*200);
     pop();
-    // stroke(lerpColor(color('#4D5359'), color('#FCB5B5'),frameCount/120));
-    // line(200,n,cos(frameCount*2)*200,sin(frameCount*2)*200);
-    // ellipse(windowWidth/2,windowHeight/2,volume);
-    // fill(lerpColor(color(66,66,66), color('#FEC601'), frameCount / 300));
 
+    push();
+    translate(width / 2, height / 2);
+    rotate(volume*4);
+    strokeWeight(2);
+    stroke(lerpColor(color('#4D5359'), color('white'),frameCount/120));
+    line(200,0,cos(frameCount*5)*200,sin(frameCount*1)*200);
+    pop();
 
+    fill('#FCB5B5')
+    noStroke();
+    ellipse(random(0,width),random(0,height),volume/4);
+    fill('#4D5359')
+    noStroke();
+    ellipse(random(0,width),random(0,height),volume/10);
+    fill('#FEC601')
+    noStroke();
+    ellipse(random(0,width),random(0,height),volume/4);
+    fill('#4D5359')
+    noStroke();
+    ellipse(random(0,width),random(0,height),volume/8);
+
+    // translate(width / 2, height / 2);
+    // rotate(volume*4);
+    // sphere(50);
     for (var j = 0; j < stars.length; j++) {
       translate(width / 2, height / 2);
       rotate(volume*3);
       stars[j].move();
       stars[j].display();
     }
+
+
   }
+
+
 }
 
 function Stella(_x, _y, _diameter) {
+
+  this.size = _diameter;
+  this.x = _x;
+  this.y = _y;
+
+  this.color = lerpColor(color(66, 66, 66), color('white'), millis(10));
+  this.speed = 1;
+  this.stroke = 'white';
+
+  this.yDir = 10;
+  this.xDir = 10;
+
+  this.move = function() {
+    this.x += random(-this.speed, this.speed);
+    this.y += random(-this.speed, this.speed);
+
+    if (this.y >= height || this.y <= 0) {
+
+      this.yDir *= -0.5;
+    }
+
+    if (this.x >= width || this.x <= 0) {
+      this.xDir *= -0.5;
+    }
+
+    this.display = function() {
+      stroke(this.stroke);
+      fill(this.color);
+      ellipse(this.x, this.y, this.size);
+    }
+  }
+}
+
+function Stelline(_x, _y, _diameter) {
 
   this.size = _diameter;
   this.x = _x;
